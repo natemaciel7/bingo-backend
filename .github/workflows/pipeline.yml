@@ -1,0 +1,56 @@
+name: Pipeline Automatizado
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  CI-ContinuousIntegration:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tests
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create .env.test
+        uses: SpicyPizza/create-envfile@v2.0.3
+        with:
+          envkey_PORT: 5000
+          envkey_POSTGRES_PASSWORD: postgres
+          envkey_POSTGRES_USER: postgres
+          envkey_POSTGRES_DB: tests
+          envkey_DATABASE_URL: postgres://postgres:postgres@postgres:5432/tests
+          file_name: .env.test
+          directory: .
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests with Docker
+        run: |
+          docker compose -f docker-compose-test.yml --env-file .env.test up --build --abort-on-container-exit --exit-code-from backend

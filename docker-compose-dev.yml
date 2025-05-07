@@ -1,0 +1,35 @@
+services:
+  postgres-dev:
+    image: postgres
+    container_name: postgres-dev
+    environment:
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    command: postgres -p ${POSTGRES_PORT}
+
+  backend-development:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: backend-dev
+    depends_on:
+      - postgres-dev
+    working_dir: /usr/src/backend
+    command: sh -c "npx prisma generate && npm run dev"
+    volumes:
+      - ./src:/usr/src/backend/src
+      - ./prisma:/usr/src/backend/prisma
+      - ./.env.dev:/usr/src/backend/.env
+      - ./tsconfig.json:/usr/src/backend/tsconfig.json
+      - ./package.json:/usr/src/backend/package.json
+      - ./package-lock.json:/usr/src/backend/package-lock.json
+    ports:
+      - 5000:5000
+
+volumes:
+  postgres-data:
