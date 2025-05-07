@@ -26,11 +26,8 @@ services:
         condition: service_healthy
     networks:
       - mynetwork
-    command: >
-      sh -c "
-      npx prisma migrate deploy &&
-      npm run test:ci
-      "
+    entrypoint: ["sh", "-c"]
+    command: "npx prisma migrate deploy && npm run test:ci"
 
 networks:
   mynetwork:
