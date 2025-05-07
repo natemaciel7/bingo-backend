@@ -10,7 +10,7 @@
     "dev:docker:down": "docker compose -f docker-compose-dev.yml --env-file .env.dev down -v",
     "dev:docker:seed": "docker-compose -f docker-compose-dev.yml run backend-development npm run seed",
     "test": "dotenv -e .env.test npm run prisma:migrate:deploy & dotenv -e .env.test jest -- -i",
-    "test:ci": "dotenv -e .env.test npm run prisma:migrate:deploy && dotenv -e .env.test jest --ci --coverage runInBand",
+    "test:ci": "dotenv -e .env.test npm run prisma:migrate:deploy && dotenv -e .env.test jest --ci --coverage --runInBand",
     "prisma:generate": "prisma generate",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
