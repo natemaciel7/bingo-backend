@@ -34,7 +34,7 @@ jobs:
   CD-PublishToDockerHub:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: CD-DeployToRender
+    needs: CI-ContinuousIntegration
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
