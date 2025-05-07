@@ -23,7 +23,7 @@ jobs:
           directory: .
           file_name: .env.test
       - name: Run tests
-        run: docker compose -f docker-compose-test.yml run --rm --abort-on-container-exit backend npm run test:ci
+        run: docker-compose -f docker-compose-test.yml run --rm --abort-on-container-exit backend npm run test:ci
 
   CD-DeployToRender:
     name: Deploy to Render
