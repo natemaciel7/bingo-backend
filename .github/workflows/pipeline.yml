@@ -16,7 +16,7 @@ jobs:
           envkey_POSTGRES_PASSWORD: "151919"
           envkey_POSTGRES_USER: "postgres"
           envkey_POSTGRES_DB: "tests"
-          envkey_DATABASE_URL: "postgres://postgres:151919@postgres-test:5432/tests"
+          envkey_DATABASE_URL: "postgres://postgres:151919@localhost:5432/tests"
           directory: .
           file_name: .env.test
       - name: Run tests
