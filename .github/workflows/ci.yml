@@ -1,4 +1,4 @@
-name: CI - Testes com Docker Compose (v2 syntax)
+name: CI - Testes com Docker Compose
 
 on:
   push:
@@ -11,17 +11,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout código
+        uses: actions/checkout@v3
 
-      - name: Verificar versão do Docker
-        run: docker --version
-
-      - name: Verificar versão do Compose
-        run: docker compose version
+      - name: Verificar versões
+        run: |
+          docker --version
+          docker compose version
 
       - name: Rodar testes com Docker Compose
-        run: docker compose -f docker-compose-test.yml up --build --abort-on-container-exit
+        run: |
+          echo "🔍 Variáveis de ambiente:"
+          printenv | grep DATABASE
 
-      - name: Verificar logs do Postgres se erro
+          echo "🔄 Subindo containers e rodando testes..."
+          docker compose -f docker-compose-test.yml up --build --abort-on-container-exit
+
+      - name: Logs do Postgres (em caso de falha)
         if: failure()
         run: docker logs postgres-test || true
+
+      - name: Logs do Backend (em caso de falha)
+        if: failure()
+        run: docker logs backend-test || true
