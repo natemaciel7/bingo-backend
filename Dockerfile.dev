@@ -1,12 +1,7 @@
 FROM node:20-slim
-
 WORKDIR /usr/src/backend
-
 COPY package*.json ./
 RUN npm install
-
 COPY prisma ./prisma
 COPY tsconfig.json ./
-
-
 CMD ["npm", "run", "dev"]
