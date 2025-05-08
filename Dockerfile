@@ -4,4 +4,4 @@ RUN apt-get update -y && apt-get install -y openssl libssl-dev && rm -rf /var/li
 COPY . .
 RUN npm install
 RUN npm run build
-CMD ["sh", "-c", "npm run prisma:generate && npm run prisma:migrate:deploy && node dist/src/server.js"]
+CMD ["sh", "-c", "npm run prisma:generate && npm run prisma:migrate:deploy && node dist/server.js"]

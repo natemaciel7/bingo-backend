@@ -15,35 +15,35 @@ async function createNewBingoGame() {
 async function getBingoGameById(gameId, includeNumbers = false) {
     return await database_1.default.game.findUnique({
         where: {
-            id: gameId
+            id: gameId,
         },
         include: {
-            numbers: includeNumbers
-        }
+            numbers: includeNumbers,
+        },
     });
 }
 async function setNumberForBingoGame(gameId, number) {
     return await database_1.default.gameNumber.create({
         data: {
             gameId,
-            value: number
-        }
+            value: number,
+        },
     });
 }
 async function updateBingoGameStatusToFinished(gameId) {
     return await database_1.default.game.update({
         where: {
-            id: gameId
+            id: gameId,
         },
         data: {
-            finished: true
-        }
+            finished: true,
+        },
     });
 }
 async function getAllNumbersFromBingoGame(gameId) {
     return await database_1.default.gameNumber.findMany({
         where: {
-            gameId
-        }
+            gameId,
+        },
     });
 }

@@ -26,6 +26,8 @@ async function generateNewNumber(gameId) {
     const numbers = await fetchNumbers(gameId);
     const extractedValues = extractOnlyTheValues(numbers);
     let nextNumber = (0, utils_1.generateRandomNumberNotUsed)(extractedValues, bingo_rules_1.default.min, bingo_rules_1.default.max);
+    if (nextNumber === null)
+        throw new Error("No number available");
     return await (0, bingo_repository_1.setNumberForBingoGame)(gameId, nextNumber);
 }
 async function finishGame(gameId) {

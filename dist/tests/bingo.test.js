@@ -52,6 +52,7 @@ describe("POST /games/start", () => {
             const game = await database_1.default.game.findUnique({
                 where: { id },
             });
+            expect(game).not.toBeNull();
             expect(game.finished).toBe(true);
         });
         it("should return 404 if game is not found", async () => {
