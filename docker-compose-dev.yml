@@ -1,35 +1,38 @@
-services:
-  postgres-dev:
-    image: postgres
-    container_name: postgres-dev
-    environment:
-      POSTGRES_USER: ${POSTGRES_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DATABASE}
-    ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    command: postgres -p ${POSTGRES_PORT}
+name: CI/CD - Back-end
 
-  backend-development:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    container_name: backend-dev
-    depends_on:
-      - postgres-dev
-    working_dir: /usr/src/backend
-    command: sh -c "npx prisma generate && npm run dev"
-    volumes:
-      - ./src:/usr/src/backend/src
-      - ./prisma:/usr/src/backend/prisma
-      - ./.env.dev:/usr/src/backend/.env
-      - ./tsconfig.json:/usr/src/backend/tsconfig.json
-      - ./package.json:/usr/src/backend/package.json
-      - ./package-lock.json:/usr/src/backend/package-lock.json
-    ports:
-      - 5000:5000
+on:
+  push:
+    branches: [main]
 
-volumes:
-  postgres-data:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - run: npm run test
+
+  build-push:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/bingo-driven-backend:latest
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy no Render
+        run: curl -X GET ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
