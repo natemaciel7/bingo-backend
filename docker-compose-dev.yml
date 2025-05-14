@@ -1,38 +1,29 @@
-name: CI/CD - Back-end
+services:
+  postgres:
+    image: postgres
+    container_name: dev-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 151919
+      POSTGRES_DB: bingo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
-on:
-  push:
-    branches: [main]
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: backend-dev
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:151919@postgres:5432/bingo
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - run: npm ci
-      - run: npx prisma generate
-      - run: npx prisma migrate deploy
-      - run: npm run test
-
-  build-push:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - uses: docker/build-push-action@v5
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/bingo-driven-backend:latest
-
-  deploy:
-    needs: build-push
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy no Render
-        run: curl -X GET ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+volumes:
+  pgdata:

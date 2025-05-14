@@ -3,8 +3,6 @@ name: CI/CD - Back-end
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   tests:
@@ -17,7 +15,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: 151919
-          POSTGRES_DB: tests
+          POSTGRES_DB: tests_db
         ports:
           - 5432:5432
         options: >-
@@ -27,7 +25,7 @@ jobs:
           --health-retries=5
 
     env:
-      DATABASE_URL: postgres://postgres:151919@localhost:5432/tests
+      DATABASE_URL: postgres://postgres:151919@localhost:5432/tests_db
 
     steps:
       - uses: actions/checkout@v3
